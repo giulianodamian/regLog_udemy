@@ -11,3 +11,25 @@ doencas_pre = pd.read_csv('~/Documentos/dados/dadosRegLog.csv',sep=';', encoding
 
 print(doencas_pre.head())
 doencas_pre.shape
+
+##OBJETIVO: Analisar se existe uma  tendência de óbito entre pessoas do sexo feminino e masculino##
+
+from collections import Counter
+Counter(doencas_pre.cs_sexo)
+sossep=';'
+doencas_pre['cs_sexo'].value_counts() #contabilizando o número de pessoas pelo sexo
+
+##Valores Missind (NAN)##
+
+print(doencas_pre.isnull().sum())
+##Excluir valores NAN de cs_sexo##
+doencas_pre.dropna(subset=['cs_sexo'], inplace=True)
+##Excluir IGNORADO##
+relacao = doencas_pre.loc[doencas_pre.cs_sexo != 'IGNORADO']
+##Excluir INDEFINIDO##
+relacao = relacao.loc[relacao.cs_sexo != 'INDEFINIDO']
+
+relacao['cs_sexo'].value_counts()
+
+import plotly.express as px
+px.pie(relacao, names="cs_sexo").show()
