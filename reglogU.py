@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!usr/bin/env python
 
 import numpy as np
 import pandas as pd
@@ -53,3 +53,49 @@ relacao['cs_sexo'] = relacao['cs_sexo'].astype('category')
 relacao['obito'] = relacao['obito'].astype('category')
 ##########################################################################
 ##########################################################################
+
+############################# MODELO 1 ###################################
+#################### Uma variável independente ###########################
+print('Modelo 1\n')
+print('Variável dependente binária (dicotômica).\n')
+print('Categorias mutuamente exclusivas (uma pessoa não pode estar em duas situações).\n')
+print('Independência das observações (sem medidas repetidas).\n')
+
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+## Análise do modelo:
+
+## Estatisicamente significativo: p<=0,05
+## Estatisticamente não é significativo: p>0,05
+## Análise da Ausência de outliers e pontos de alavancagem deve estar entre -3 e 3
+
+modelo1 = smf.glm(formula='obito ~ cs_sexo', data=relacao, family= sm.families.Binomial()).fit()
+print(modelo1.summary())
+modelo1.params
+modelo_prova = smf.glm(formula='cs_sexo ~obito', data=relacao, family= sm.families.Binomial()).fit()
+print(modelo_prova.summary())
+
+##Razão de chance com Intervalo de confiança de 95%
+
+razao = np.exp(modelo1.params[1])
+print(razao)
+
+##  CONCLUSÃO: com intervalo de confiança de 95%, os homens tem 63,97%
+# a menos de chance de spbreviver do que as mulheres.
+
+coef = 1/razao
+print(coef)
+
+## Estatisticamente, com intervalo de confiança de 95%, a chance de 
+# uma pessoa do sexo masculino ir a óbito é 1,56 vezes maior do que 
+# a chance de uma pessoa do sexo feminino.
+
+
+######################################################################
+######################################################################
+
+################################### MODELO 2 #########################
+######################## Mais de uma variável independente ###########
+
+## Diabetes e sexo
