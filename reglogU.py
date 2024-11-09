@@ -32,4 +32,24 @@ relacao = relacao.loc[relacao.cs_sexo != 'INDEFINIDO']
 relacao['cs_sexo'].value_counts()
 
 import plotly.express as px
-px.pie(relacao, names="cs_sexo").show()
+px.pie(relacao, names="cs_sexo")
+
+##Análise dos óbitos##
+relacao.obito.value_counts()
+px.pie(relacao, names='obito')
+
+##Renomeando registros da variável obito##
+
+relacao['obito'] = relacao['obito'].replace({0:'nao', 1:'sim'})
+
+print(relacao.head())
+
+print(relacao.dtypes)
+print(relacao.obito.value_counts())
+
+##Transformando em variáveis categóricas##
+
+relacao['cs_sexo'] = relacao['cs_sexo'].astype('category')
+relacao['obito'] = relacao['obito'].astype('category')
+##########################################################################
+##########################################################################
