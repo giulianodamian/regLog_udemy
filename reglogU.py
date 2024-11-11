@@ -1,4 +1,4 @@
-#!usr/bin/env python
+#!/home/giuliano/anaconda3/envs/regLog_u/bin/python
 
 import numpy as np
 import pandas as pd
@@ -9,7 +9,7 @@ doencas_pre = pd.read_csv('~/Documentos/dados/dadosRegLog.csv',sep=';', encoding
 
 ##Análise Inicial##
 
-print(doencas_pre.head())
+doencas_pre.head()
 doencas_pre.shape
 
 ##OBJETIVO: Analisar se existe uma  tendência de óbito entre pessoas do sexo feminino e masculino##
@@ -21,7 +21,7 @@ doencas_pre['cs_sexo'].value_counts() #contabilizando o número de pessoas pelo 
 
 ##Valores Missind (NAN)##
 
-print(doencas_pre.isnull().sum())
+doencas_pre.isnull().sum()
 ##Excluir valores NAN de cs_sexo##
 doencas_pre.dropna(subset=['cs_sexo'], inplace=True)
 ##Excluir IGNORADO##
@@ -53,6 +53,8 @@ relacao['cs_sexo'] = relacao['cs_sexo'].astype('category')
 relacao['obito'] = relacao['obito'].astype('category')
 ##########################################################################
 ##########################################################################
+
+'''
 
 ############################# MODELO 1 ###################################
 #################### Uma variável independente ###########################
@@ -91,6 +93,7 @@ print(coef)
 # uma pessoa do sexo masculino ir a óbito é 1,56 vezes maior do que 
 # a chance de uma pessoa do sexo feminino.
 
+'''
 
 ######################################################################
 ######################################################################
@@ -99,3 +102,29 @@ print(coef)
 ######################## Mais de uma variável independente ###########
 
 ## Diabetes e sexo
+
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+relacao['diabetes'].value_counts()
+
+import plotly.express as px
+px.pie(relacao, names='diabetes')
+
+relacao2= relacao.loc[relacao.diabetes != 'IGNORADO']
+
+px.pie(relacao2, names='diabetes')
+
+## Antes da exclusão de ignorados em diabetes ##
+px.pie(relacao, names='obito')
+
+## Depois da exclusão de ignorados em diabetes ##
+
+px.pie(relacao2, names = 'obito')
+
+relacao2.dtypes
+relacao2['diabetes'] = relacao2['diabetes'].astype('category')
+
+
+##=====>> Criação do modelo 2
+
