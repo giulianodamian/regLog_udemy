@@ -53,9 +53,6 @@ relacao['cs_sexo'] = relacao['cs_sexo'].astype('category')
 relacao['obito'] = relacao['obito'].astype('category')
 ##########################################################################
 ##########################################################################
-
-'''
-
 ############################# MODELO 1 ###################################
 #################### Uma variável independente ###########################
 print('Modelo 1\n')
@@ -93,7 +90,6 @@ print(coef)
 # uma pessoa do sexo masculino ir a óbito é 1,56 vezes maior do que 
 # a chance de uma pessoa do sexo feminino.
 
-'''
 
 ######################################################################
 ######################################################################
@@ -128,3 +124,25 @@ relacao2['diabetes'] = relacao2['diabetes'].astype('category')
 
 ##=====>> Criação do modelo 2
 
+# Ausência de Multicolinearidade entre as variáveis independentes.
+#Análise do Modelo:
+# Estatisticamente significativo p<=0,05
+# Estatisticamente não é significativo p>0,05
+# Análise da ausência de outliers e pontos de alavancagem
+# Deve estar entre -3 e 3
+
+modelo2 = smf.glm(formula='obito ~ cs_sexo + diabetes', data = relacao2, family = sm.families.Binomial()).fit()
+print(modelo2.summary())
+modelo2.params
+
+## Chance com intervalo de confiança de 95% dos homens como relação às mulheres 
+
+chance = 1/ (np.exp(modelo2.params[2]))
+chance
+
+## Conclusão: o resultado da diabetes está inconsistente devido a presença enorme de dados ignorados.
+
+################################# Modelo 3 #############################################
+########################################################################################
+
+## Variável Idade
