@@ -1,5 +1,6 @@
 #!/home/giuliano/anaconda3/envs/regLog_u/bin/python
-
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import numpy as np
 import pandas as pd
 
@@ -146,3 +147,48 @@ chance
 ########################################################################################
 
 ## Variável Idade
+
+relacao3 = doencas_pre.loc[doencas_pre.nome_munic == 'Santos']
+relacao3.head()
+relacao3.shape
+relacao3.dtypes
+
+## Valores Missing (NAN)
+
+relacao3.isnull().sum()
+
+# Excluir valores missing
+relacao3.dropna(subset=['idade'], inplace=True)
+
+import matplotlib.pyplot as plt
+plt.scatter(relacao3.idade,relacao3.obito)
+plt.xlabel('IDADE')
+plt.ylabel('ÓBITO')
+plt.grid(False)
+plt.show()
+
+#Ausência de multicolinearidade
+np.corrcoef(relacao3.obito, relacao3.idade)
+
+## Criação do modelo 3 com StatsModels
+
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+modelo3 = smf.glm(formula='obito ~ idade', data=relacao3, family = sm.families.Binomial()).fit()
+print(modelo3.summary())
+
+'''summary = modelo3.summary().as_text()
+with open('summary.txt','w') as f:
+    f.write(summary)'''
+
+#Razão de chance com intervalo de confiança de 95%
+
+print(np.exp(modelo3.params[1]))
+
+# Conclusão: Para cada ano mais velho, o indivíduo fica com 1,12 chances de outro indivíduo a menos.
+
+###########################################################################
+
+###++++++>>> Modelo 3 com Sklearn
+
