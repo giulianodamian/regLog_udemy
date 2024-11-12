@@ -165,7 +165,7 @@ plt.scatter(relacao3.idade,relacao3.obito)
 plt.xlabel('IDADE')
 plt.ylabel('ÓBITO')
 plt.grid(False)
-plt.show()
+#plt.show()
 
 #Ausência de multicolinearidade
 np.corrcoef(relacao3.obito, relacao3.idade)
@@ -192,3 +192,66 @@ print(np.exp(modelo3.params[1]))
 
 ###++++++>>> Modelo 3 com Sklearn
 
+from sklearn.linear_model import LogisticRegression
+relacao3.head()
+## Criação das variáveis x (independentes) e y (dependente)
+# Transformação de X para o formato de matriz.
+
+x = relacao3.iloc[:,2].values
+y = relacao3.iloc[:,6].values
+
+# Transformação de x para o formato de matriz
+
+x = x.reshape(-1,1)
+
+
+modelo3s = LogisticRegression()
+modelo3s.fit(x,y)
+modelo3s.coef_
+modelo3s.intercept_
+
+#Razão de chance com intervalo de confiança de 95%
+np.exp(modelo3s.coef_)
+
+# Para cada ano mais velho, o indivíduo fica com 1,12 das chances de outro indivíduo com um ano a menos.
+
+plt.scatter(x,y)
+# Geração de novos dados para gerar a função sigmoide
+x_teste = np.linspace(0, 130, 100)
+
+def model(w): # função sigmoide
+    return 1 / (1+np.exp(-w))
+# Geração de previsões (variável r) e visualização dos resultados
+previsao = model(x_teste * modelo3s.coef_ + modelo3s.intercept_).ravel()
+plt.plot(x_teste, previsao, color = 'red')
+#plt.show()
+
+# Testando o modelo com os resultados de outra cidade (Jundiaí)
+
+jundiai = doencas_pre.loc[doencas_pre.nome_munic == 'Jundiaí']
+jundiai.head()
+jundiai.shape
+
+#Valores Missin (NAN)
+
+jundiai.isnull().sum()
+# Excluir valores missing
+jundiai.dropna(subset=['idade'], inplace=True)
+#Mudança dos dados para o formato de matriz
+idade = jundiai.iloc[:,2].values
+idade = idade.reshape(-1,1)
+
+# Previsões e geração da noca base de dados com valores originais  e as previsões
+previsoes_teste = modelo3s.predict(idade)
+print(previsoes_teste)
+
+jundiai['previsões'] = previsoes_teste
+jundiai = jundiai.drop(columns=['obito', 'previsões']).assign(obito=jundiai['obito'], previsoes=jundiai['previsões'])
+jundiai.head(30)
+jundiai['resultado'] = jundiai['obito'] + jundiai['previsoes']
+jundiai.head(25)
+jundiai["resultado"] = jundiai["resultado"].replace({0:"acertou", 1:"errou", 2:"acertou"})
+jundiai.head(25)
+jundiai['resultado'].value_counts()
+px.pie(jundiai, names="resultado").show()
+jundiai.to_csv('resultados_jundiai.csv', encoding = 'iso-8859-1', index = False)
